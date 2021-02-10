@@ -13,15 +13,16 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz",
+    "react-native-elements": "^3.2.0",
     "react-native-web": "~0.13.12",
     "socket.io-client": "^3.1.1"
   },
   "devDependencies": {
-    "@types/socket.io-client": "^1.4.35",
     "@babel/core": "~7.9.0",
     "@types/react": "~16.9.35",
     "@types/react-dom": "~16.9.8",
     "@types/react-native": "~0.63.2",
+    "@types/socket.io-client": "^1.4.35",
     "typescript": "~4.0.0"
   },
   "private": true
