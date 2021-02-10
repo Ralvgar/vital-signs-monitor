@@ -10,6 +10,14 @@ import {
 import io from "socket.io-client";
 import { Main } from "./screens/Main/Main";
 
+const mockData = [
+  { name: "Pedro", value: "3" },
+  { name: "Paco", value: "3" },
+  { name: "Raul", value: "3" },
+  { name: "Andrea", value: "3" },
+  { name: "Iker", value: "3" },
+];
+
 export default function App() {
   const [recivedSocket, setRecivedSocket] = useState<String>();
 
@@ -22,7 +30,7 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.mainContainer}>
-        <Main />
+        <Main patientData={mockData} />
       </View>
 
       <Text>Text recived: {recivedSocket}</Text>
