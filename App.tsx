@@ -1,7 +1,7 @@
-import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Platform, StatusBar, SafeAreaView } from "react-native";
 import io from "socket.io-client";
+import { Main } from "./screens/Main/Main";
 
 export default function App() {
   const [recivedSocket, setRecivedSocket] = useState<String>();
@@ -13,18 +13,22 @@ export default function App() {
   });
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.mainContainer}>
+        <Main />
+      </View>
+
       <Text>Text recived: {recivedSocket}</Text>
-      <StatusBar style="auto" />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    padding: 20,
+    alignItems: "stretch",
+  }, 
+  mainContainer: {
   },
 });
