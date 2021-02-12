@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, Switch } from "react-native";
-import { Avatar, ListItem, Icon, Badge } from "react-native-elements";
+import { StyleSheet, View, Text } from "react-native";
+import { Avatar, ListItem, Icon } from "react-native-elements";
 import { BaseHeader } from "../../components/Header/BaseHeader";
 
 interface PatientData {
@@ -10,6 +10,7 @@ interface PatientData {
 
 interface PatientsSocketData {
   room: string;
+  sensor: "heart" | "temperature";
   value: string;
   // temperature?: string;
   // bloodPreasure?: string;
@@ -19,9 +20,9 @@ interface PatientsSocketData {
 
 interface PatientState {
   room: string;
-  value: string;
-  name: string;
-  // temperature?: string;
+  heart?: string;
+  temperature?: string;
+  //temperature?: string;
   // bloodPreasure?: string;
   // heartRate?: string;
   // breathingFrequency?: string;
@@ -39,29 +40,45 @@ export const Main = ({ patientsSocketData, patientData }: Props) => {
   console.log(patientState);
 
   useEffect(() => {
-    if (patientsSocketData) {
-      patientData.forEach((patient, idx) => {
-        setPatientState((prev: any) => [
-          ...prev,
-          {
-            room: patient.room,
-            name: patient.name,
-            value:
-              patient.room === patientsSocketData.room
-                ? patientsSocketData.value
-                : prev.value,
-          },
-        ]);
-      });
+    if (!patientsSocketData) {
+      return;
     }
+    setPatientState((prevState) => {
+      const foundPatientState = prevState.find(
+        (state: PatientState) => state.room === patientsSocketData.room
+      );
+      if (!foundPatientState) {
+        return [
+          ...prevState,
+          {
+            room: patientsSocketData.room,
+            [patientsSocketData.sensor]: patientsSocketData.value,
+          },
+        ];
+      } else {
+        return [
+          ...prevState.filter((item) => item.room !== patientsSocketData.room),
+          Object.assign({}, foundPatientState, {
+            [patientsSocketData.sensor]: patientsSocketData.value,
+          }),
+        ];
+      }
+    });
   }, [patientsSocketData]);
+
+  const renderRoomValue = (room: string, sensor: "heart" | "temperature") => {
+    const patientData = patientState.find(
+      (patientsSocketDataItem) => patientsSocketDataItem.room === room
+    );
+    return patientData && patientData[sensor] ? patientData[sensor] : "-";
+  };
 
   return (
     <View style={styles.container}>
       <BaseHeader />
 
-      {!!patientState &&
-        patientState.map((patient, idx) => {
+      {!!patientData &&
+        patientData.map((patient, idx) => {
           return (
             <ListItem key={patient.name} style={styles.patient} bottomDivider>
               <Avatar
@@ -82,8 +99,10 @@ export const Main = ({ patientsSocketData, patientData }: Props) => {
               </ListItem.Content>
 
               <Icon name="heartbeat" type="font-awesome" color="#cc1f2d" />
-              <Text style={styles.patientConstants}>{patient.value}</Text>
-
+              <Text style={styles.patientConstants}>
+                {renderRoomValue(patient.room, "heart")}
+                {renderRoomValue(patient.room, "temperature")}
+              </Text>
               <ListItem.Chevron />
             </ListItem>
           );
