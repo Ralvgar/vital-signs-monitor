@@ -5,12 +5,12 @@ export const BaseHeader = () => {
   return (
     <>
       <Header
-        leftComponent={{ icon: "menu", color: "#fff" }}
+        leftComponent={{ icon: "menu", color: "#f0f0f0" }}
         centerComponent={{
           text: "Vital Signs Monitor",
-          style: { color: "#fff" },
+          style: { color: "#f0f0f0" },
         }}
-        rightComponent={{ icon: "home", color: "#fff" }}
+        rightComponent={{ icon: "home", color: "#f0f0f0" }}
       />
     </>
   );
