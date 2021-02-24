@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { StyleSheet, Animated, Text } from "react-native";
 import { Badge } from "react-native-elements";
 import { SensorValues } from "../../screens/Main/Main";
@@ -15,7 +15,8 @@ export const RenderValueWithAnimation = ({
     setIntermitentAnimationIsActive,
   ] = useState<boolean>(false);
   const onValueChangeAnimatedValue = new Animated.Value(0);
-  const intermitentIconAnimationAnimatedValue = new Animated.Value(0);
+  const intermitentIconAnimationAnimatedValue = useRef(new Animated.Value(0))
+    .current;
 
   useEffect(() => {
     if (!!sensorValue) {
@@ -24,39 +25,39 @@ export const RenderValueWithAnimation = ({
         setIntermitentAnimationIsActive(true);
       } else if (typeOfValue === "breathingFrequency" && sensorNumber <= 50) {
         setIntermitentAnimationIsActive(true);
+      } else if (typeOfValue === "bloodPreasure" && sensorNumber <= 100) {
+        setIntermitentAnimationIsActive(true);
       } else {
         setIntermitentAnimationIsActive(false);
-        intermitentIconAnimationAnimatedValue.setValue(0);
       }
     }
   }, [sensorValue]);
 
-  const intermitentIconAnimation = () => {
-    Animated.loop(
-      Animated.spring(intermitentIconAnimationAnimatedValue, {
-        toValue: 1,
-        useNativeDriver: true,
-        delay: 1000,
-      }),
-      {
-        iterations: -1,
-      }
-    ).start();
-  };
+  useEffect(() => {
+    intermitentIconAnimation.stop();
+    intermitentIconAnimationAnimatedValue.setValue(0);
+    intermitentAnimationIsActive && intermitentIconAnimation.start();
+  }, [intermitentAnimationIsActive]);
+
+  const intermitentIconAnimation = useMemo(
+    () =>
+      Animated.loop(
+        Animated.spring(intermitentIconAnimationAnimatedValue, {
+          toValue: 1,
+          useNativeDriver: true,
+          delay: 1000,
+        })
+      ),
+    []
+  );
 
   const onValueChange = () => {
     Animated.timing(onValueChangeAnimatedValue, {
       toValue: 1,
       duration: 1000,
       useNativeDriver: false,
-    }).start(() => {
-      onValueChangeAnimatedValue.setValue(0);
-    });
+    }).start(() => onValueChangeAnimatedValue.setValue(0));
   };
-
-  intermitentAnimationIsActive
-    ? intermitentIconAnimation()
-    : intermitentIconAnimationAnimatedValue.setValue(0);
 
   return (
     <Animated.View
