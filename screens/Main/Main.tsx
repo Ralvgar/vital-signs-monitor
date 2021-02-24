@@ -3,19 +3,30 @@ import { StyleSheet, View } from "react-native";
 import { Avatar, ListItem, Icon } from "react-native-elements";
 import { BaseHeader } from "../../components/Header/BaseHeader";
 import { RenderValueWithAnimation } from "../../components/RenderValueWithAnimation/RenderValueWithAnimation";
-import { PatientsSocketData } from "../../components/types/types";
 
 interface PatientData {
   room: string;
   name: string;
 }
 
+export interface PatientsSocketData {
+  room: string;
+  sensor: SensorValues;
+  value: string;
+}
+
+export type SensorValues =
+  | "heartRate"
+  | "bloodPreasure"
+  | "breathingFrequency"
+  | "oxygenSaturation";
+
 //  pulso (ppm), tension: bloodPreasure (120/70) y saturacion(%)
 
 interface PatientState {
   room: string;
   heart?: string;
-  temperature?: string;
+  oxygenSaturation?: string;
   bloodPreasure?: string;
   heartRate?: string;
   breathingFrequency?: string;
@@ -29,6 +40,14 @@ interface Props {
 export const Main = ({ patientsSocketData, patientData }: Props) => {
   const [user, setUser] = useState<any>();
   const [patientState, setPatientState] = useState<PatientState[]>([]);
+
+  const renderRoomValue = (room: string, sensor: SensorValues) => {
+    const patientData = patientState.find(
+      (patientsSocketDataItem: PatientState) =>
+        patientsSocketDataItem.room === room
+    );
+    return patientData && patientData[sensor] ? patientData[sensor] : "";
+  };
 
   useEffect(() => {
     if (!patientsSocketData) {
@@ -58,8 +77,6 @@ export const Main = ({ patientsSocketData, patientData }: Props) => {
     });
   }, [patientsSocketData]);
 
-  console.log(patientState);
-
   return (
     <View>
       <BaseHeader />
@@ -67,7 +84,7 @@ export const Main = ({ patientsSocketData, patientData }: Props) => {
       {!!patientData &&
         patientData.map((patient, idx) => {
           return (
-            <View>
+            <View key={patient.name + idx + idx}>
               <ListItem key={patient.name}>
                 <Avatar
                   rounded
@@ -82,7 +99,7 @@ export const Main = ({ patientsSocketData, patientData }: Props) => {
                 />
                 <ListItem.Content>
                   <ListItem.Title
-                    style={{ alignSelf: "stretch" }}
+                    style={styles.patientNameText}
                     onPress={() => setUser(patient.name)}
                   >
                     {patient.name}
@@ -99,9 +116,8 @@ export const Main = ({ patientsSocketData, patientData }: Props) => {
                   />
 
                   <RenderValueWithAnimation
-                    patientState={patientState}
-                    dataValue={patient.room}
-                    sensorValue={"bloodPressure"}
+                    sensorValue={renderRoomValue(patient.room, "bloodPreasure")}
+                    typeOfValue={"bloodPreasure"}
                   />
                 </View>
                 <View style={styles.valuesWithIcons}>
@@ -112,9 +128,11 @@ export const Main = ({ patientsSocketData, patientData }: Props) => {
                     style={styles.icon}
                   />
                   <RenderValueWithAnimation
-                    patientState={patientState}
-                    dataValue={patient.room}
-                    sensorValue={"breathingFrequency"}
+                    sensorValue={renderRoomValue(
+                      patient.room,
+                      "breathingFrequency"
+                    )}
+                    typeOfValue={"breathingFrequency"}
                   />
                 </View>
                 <View style={styles.valuesWithIcons}>
@@ -125,9 +143,8 @@ export const Main = ({ patientsSocketData, patientData }: Props) => {
                     style={styles.icon}
                   />
                   <RenderValueWithAnimation
-                    patientState={patientState}
-                    dataValue={patient.room}
-                    sensorValue={"heartRate"}
+                    sensorValue={renderRoomValue(patient.room, "heartRate")}
+                    typeOfValue={"heartRate"}
                   />
                 </View>
               </ListItem>
@@ -149,5 +166,9 @@ const styles = StyleSheet.create({
   icon: {
     paddingHorizontal: 5,
     paddingBottom: 10,
+  },
+  patientNameText: {
+    alignSelf: "stretch",
+    fontSize: 18,
   },
 });
