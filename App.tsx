@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { NativeRouter, Route, Link } from "react-router-native";
 import io from "socket.io-client";
 import { Main } from "./screens/Main/Main";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import mockData from "./mockData.json";
+import { Room } from "./screens/Room/Room";
 
 export default function App() {
   const [recivedSocket, setRecivedSocket] = useState<any>();
@@ -15,21 +15,16 @@ export default function App() {
   });
 
   return (
-    <SafeAreaProvider style={styles.container}>
-      <View style={styles.mainContainer}>
+    <NativeRouter>
+      <Route exact path="/">
         <Main
           patientsSocketData={recivedSocket && JSON.parse(recivedSocket)}
           patientData={mockData}
         />
-      </View>
-    </SafeAreaProvider>
+      </Route>
+      <Route path="/room">
+        <Room />
+      </Route>
+    </NativeRouter>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#bdbdbd",
-    alignItems: "stretch",
-  },
-  mainContainer: {},
-});
